@@ -111,7 +111,7 @@ console.log(
   "Количество товаров после удаления по id:",
   BasketModel.getItemCount()
 );
-console.log("Общая сумма после удаления по id:", cardModel.getTotalPrice());
+console.log("Общая сумма после удаления по id:", BasketModel.getTotalPrice());
 
 console.log("Тестирование clear(): Очистка корзины");
 BasketModel.clear();
