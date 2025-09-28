@@ -1,5 +1,5 @@
 import { Api } from "./components/base/Api";
-import { Card } from "./components/Models/Card";
+import { Basket } from "./components/Models/Basket";
 import { Catalog } from "./components/Models/Catatog";
 import { Buyer } from "./components/Models/Buyer";
 import "./scss/styles.scss";
@@ -8,7 +8,7 @@ import { API_URL } from "./utils/constants";
 
 const baseApi = new Api(API_URL);
 const catalogModel = new Catalog();
-const cardModel = new Card();
+const BasketModel = new Basket();
 const buyerModel = new Buyer();
 
 //  ************************
@@ -16,7 +16,7 @@ const buyerModel = new Buyer();
 //  ************************
 
 console.log("************************");
-console.log("тестирование класса Card");
+console.log("тестирование класса Basket");
 console.log("************************");
 
 // Тестовые данные
@@ -50,85 +50,85 @@ const testProducts: IProduct[] = [
 
 console.log(
   "Тестирование getItems(): Получение списка товаров в корзине (изначально пусто):",
-  [...cardModel.getItems()]
+  [...BasketModel.getItems()]
 );
 
 console.log(
   "Тестирование addItem(): Добавление первого товара (+1 час в сутках)"
 );
-cardModel.addItem(testProducts[0]);
+BasketModel.addItem(testProducts[0]);
 console.log("Список товаров после добавления первого товара (1шт):", [
-  ...cardModel.getItems(),
+  ...BasketModel.getItems(),
 ]);
 
 console.log("Тестирование addItem(): Добавление второго товара (HEX-леденец)");
-cardModel.addItem(testProducts[1]);
+BasketModel.addItem(testProducts[1]);
 console.log("Список товаров после добавления второго товара (2шт):", [
-  ...cardModel.getItems(),
+  ...BasketModel.getItems(),
 ]);
 
 console.log(
   "Тестирование addItem(): Добавление третьего товара (Мамка-таймер)"
 );
-cardModel.addItem(testProducts[2]);
+BasketModel.addItem(testProducts[2]);
 console.log("Список товаров после добавления третьего товара (3шт):", [
-  ...cardModel.getItems(),
+  ...BasketModel.getItems(),
 ]);
 
 console.log(
   "Тестирование getItemCount(): Количество товаров в корзине (должно быть 3):",
-  cardModel.getItemCount()
+  BasketModel.getItemCount()
 );
 
 console.log(
   "Тестирование getTotalPrice(): Общая сумма товаров в корзине (с учётом null цены):",
-  cardModel.getTotalPrice()
+  BasketModel.getTotalPrice()
 );
 
 console.log(
   'Тестирование hasItem(): Наличие товара с id "854cef69-976d-4c2a-a18c-2aa45046c390" (должен быть true):',
-  cardModel.hasItem("854cef69-976d-4c2a-a18c-2aa45046c390")
+  BasketModel.hasItem("854cef69-976d-4c2a-a18c-2aa45046c390")
 );
 console.log(
   'Тестирование hasItem(): Наличие товара с id "nonexistent" (должен быть false):',
-  cardModel.hasItem("nonexistent")
+  BasketModel.hasItem("nonexistent")
 );
 
 console.log(
   'Тестирование removeItem(): Удаление товара "HEX-леденец" по объекту'
 );
-cardModel.removeItem(testProducts[1]);
-console.log("Список товаров после удаления:", [...cardModel.getItems()]);
-console.log("Количество товаров после удаления:", cardModel.getItemCount());
-console.log("Общая сумма после удаления:", cardModel.getTotalPrice());
+BasketModel.removeItem(testProducts[1]);
+console.log("Список товаров после удаления:", [...BasketModel.getItems()]);
+console.log("Количество товаров после удаления:", BasketModel.getItemCount());
+console.log("Общая сумма после удаления:", BasketModel.getTotalPrice());
 
 console.log(
   'Тестирование removeItemById(): Удаление товара с id "854cef69-976d-4c2a-a18c-2aa45046c390"'
 );
-cardModel.removeItemById("854cef69-976d-4c2a-a18c-2aa45046c390");
-console.log("Список товаров после удаления по id:", [...cardModel.getItems()]);
+BasketModel.removeItemById("854cef69-976d-4c2a-a18c-2aa45046c390");
+console.log("Список товаров после удаления по id:", [...BasketModel.getItems()]);
 console.log(
   "Количество товаров после удаления по id:",
-  cardModel.getItemCount()
+  BasketModel.getItemCount()
 );
 console.log("Общая сумма после удаления по id:", cardModel.getTotalPrice());
 
 console.log("Тестирование clear(): Очистка корзины");
-cardModel.clear();
+BasketModel.clear();
 console.log("Список товаров после очистки (должен быть пустым):", [
-  ...cardModel.getItems(),
+  ...BasketModel.getItems(),
 ]);
 console.log(
   "Количество товаров после очистки (должно быть 0):",
-  cardModel.getItemCount()
+  BasketModel.getItemCount()
 );
 console.log(
   "Общая сумма после очистки (должна быть 0):",
-  cardModel.getTotalPrice()
+  BasketModel.getTotalPrice()
 );
 console.log(
   "Проверка hasItem() после очистки (должен быть false):",
-  cardModel.hasItem("b06cde61-912f-4663-9751-09956c0eed67")
+  BasketModel.hasItem("b06cde61-912f-4663-9751-09956c0eed67")
 );
 
 //  ************************

@@ -1,6 +1,6 @@
 import { IProduct } from "../../types";
 
-export class Card {
+export class Basket {
   private items: IProduct[] = [];
 
    // Получить список товаров в корзине
