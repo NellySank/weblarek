@@ -5,299 +5,115 @@ import { Buyer } from "./components/Models/Buyer";
 import "./scss/styles.scss";
 import { IProduct, WebLarekAPI } from "./types";
 import { API_URL } from "./utils/constants";
+import { EventEmitter } from "./components/base/Events";
+import { Gallery } from "./components/Views/Gallery";
+import { CardCatalog } from "./components/Views/CardCatalog";
+import { cloneTemplate } from "./utils/utils.ts"
+import { Header } from "./components/Views/Header.ts";
+import { CardPreview } from "./components/Views/CardPreview.ts";
+import { Modal } from "./components/Views/Modal.ts";
+import { CardBasket } from "./components/Views/CardBasket.ts";
+import { BasketModal } from "./components/Views/BasketModal.ts";
 
 const baseApi = new Api(API_URL);
-const catalogModel = new Catalog();
-const BasketModel = new Basket();
+const events = new EventEmitter();
+const catalogModel = new Catalog(events);
+
+const BasketModel = new Basket(events);
 const buyerModel = new Buyer();
 
-//  ************************
-//  тестирование класса Card
-//  ************************
+const pageElement = document.querySelector('.page') as HTMLElement;
+const gallery = new Gallery(events, pageElement);
 
-console.log("************************");
-console.log("тестирование класса Basket");
-console.log("************************");
+const headerElement = document.querySelector('.header') as HTMLElement; 
+const header = new Header(events, headerElement);
 
-// Тестовые данные
-const testProducts: IProduct[] = [
-  {
-    id: "854cef69-976d-4c2a-a18c-2aa45046c390",
-    description: "Если планируете решать задачи в тренажёре, берите два.",
-    image: "/5_Dots.svg",
-    title: "+1 час в сутках",
-    category: "софт-скил",
-    price: 750,
-  },
-  {
-    id: "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
-    description:
-      "Лизните этот леденец, чтобы мгновенно запоминать и узнавать любой цветовой код CSS.",
-    image: "/Shell.svg",
-    title: "HEX-леденец",
-    category: "другое",
-    price: 1450,
-  },
-  {
-    id: "b06cde61-912f-4663-9751-09956c0eed67",
-    description: "Будет стоять над душой и не давать прокрастинировать.",
-    image: "/Asterisk_2.svg",
-    title: "Мамка-таймер",
-    category: "софт-скил",
-    price: null,
-  },
-];
+const modalElement = document.querySelector('.modal') as HTMLElement;
+const modal = new Modal(events, modalElement);
 
-console.log(
-  "Тестирование getItems(): Получение списка товаров в корзине (изначально пусто):",
-  [...BasketModel.getItems()]
-);
-
-console.log(
-  "Тестирование addItem(): Добавление первого товара (+1 час в сутках)"
-);
-BasketModel.addItem(testProducts[0]);
-console.log("Список товаров после добавления первого товара (1шт):", [
-  ...BasketModel.getItems(),
-]);
-
-console.log("Тестирование addItem(): Добавление второго товара (HEX-леденец)");
-BasketModel.addItem(testProducts[1]);
-console.log("Список товаров после добавления второго товара (2шт):", [
-  ...BasketModel.getItems(),
-]);
-
-console.log(
-  "Тестирование addItem(): Добавление третьего товара (Мамка-таймер)"
-);
-BasketModel.addItem(testProducts[2]);
-console.log("Список товаров после добавления третьего товара (3шт):", [
-  ...BasketModel.getItems(),
-]);
-
-console.log(
-  "Тестирование getItemCount(): Количество товаров в корзине (должно быть 3):",
-  BasketModel.getItemCount()
-);
-
-console.log(
-  "Тестирование getTotalPrice(): Общая сумма товаров в корзине (с учётом null цены):",
-  BasketModel.getTotalPrice()
-);
-
-console.log(
-  'Тестирование hasItem(): Наличие товара с id "854cef69-976d-4c2a-a18c-2aa45046c390" (должен быть true):',
-  BasketModel.hasItem("854cef69-976d-4c2a-a18c-2aa45046c390")
-);
-console.log(
-  'Тестирование hasItem(): Наличие товара с id "nonexistent" (должен быть false):',
-  BasketModel.hasItem("nonexistent")
-);
-
-console.log(
-  'Тестирование removeItem(): Удаление товара "HEX-леденец" по объекту'
-);
-BasketModel.removeItem(testProducts[1]);
-console.log("Список товаров после удаления:", [...BasketModel.getItems()]);
-console.log("Количество товаров после удаления:", BasketModel.getItemCount());
-console.log("Общая сумма после удаления:", BasketModel.getTotalPrice());
-
-console.log(
-  'Тестирование removeItemById(): Удаление товара с id "854cef69-976d-4c2a-a18c-2aa45046c390"'
-);
-BasketModel.removeItemById("854cef69-976d-4c2a-a18c-2aa45046c390");
-console.log("Список товаров после удаления по id:", [...BasketModel.getItems()]);
-console.log(
-  "Количество товаров после удаления по id:",
-  BasketModel.getItemCount()
-);
-console.log("Общая сумма после удаления по id:", BasketModel.getTotalPrice());
-
-console.log("Тестирование clear(): Очистка корзины");
-BasketModel.clear();
-console.log("Список товаров после очистки (должен быть пустым):", [
-  ...BasketModel.getItems(),
-]);
-console.log(
-  "Количество товаров после очистки (должно быть 0):",
-  BasketModel.getItemCount()
-);
-console.log(
-  "Общая сумма после очистки (должна быть 0):",
-  BasketModel.getTotalPrice()
-);
-console.log(
-  "Проверка hasItem() после очистки (должен быть false):",
-  BasketModel.hasItem("b06cde61-912f-4663-9751-09956c0eed67")
-);
-
-//  ************************
-//  тестирование класса Buyer
-//  ************************
-
-console.log("************************");
-console.log("тестирование класса Buyer");
-console.log("************************");
-
-// Тестовые данные для Buyer
-const testBuyerData: Partial<Buyer> = {
-  payment: "online",
-  address: "ул. Стасова, 60 кв 67",
-  email: "ivanov_ii@yandex.ru",
-  phone: "+7 (999) 123-45-67",
-};
-
-console.log("Тестирование конструктора: Создание Buyer без данных");
-console.log("getData() (должен быть пустым):", { ...buyerModel.getData() });
-console.log("isValid() (должен быть false):", buyerModel.isValid());
-console.log("validate() (должен содержать ошибки для всех полей):", {
-  ...buyerModel.validate(),
-});
-
-const buyerPartial = new Buyer({
-  payment: "cash",
-  email: "partial@example.com",
-});
-console.log(
-  "Тестирование конструктора: Создание Buyer с частичными данными (payment и email)"
-);
-console.log("getData():", { ...buyerPartial.getData() });
-console.log(
-  "isValid() (должен быть false, так как address и phone пустые):",
-  buyerPartial.isValid()
-);
-console.log("validate():", { ...buyerPartial.validate() });
-
-const buyerFull = new Buyer(testBuyerData);
-console.log("Тестирование конструктора: Создание Buyer с полными данными");
-console.log("getData():", { ...buyerFull.getData() });
-console.log("isValid() (должен быть true):", buyerFull.isValid());
-console.log("validate() (должен быть пустым объектом):", {
-  ...buyerFull.validate(),
-});
-
-console.log(
-  "Тестирование setData(): Установка частичных данных (address и phone)"
-);
-buyerModel.setData({
-  address: "ул. Пушкина, д. 1",
-  phone: "+7 (888) 765-43-21",
-});
-console.log("getData() после setData():", { ...buyerModel.getData() });
-console.log(
-  "isValid() (должен быть false, так как payment и email пустые):",
-  buyerModel.isValid()
-);
-console.log("validate():", { ...buyerModel.validate() });
-
-console.log("Тестирование setData(): Установка полных данных");
-buyerModel.setData(testBuyerData);
-console.log("getData() после полной setData():", { ...buyerModel.getData() });
-console.log("isValid() (должен быть true):", buyerModel.isValid());
-console.log("validate() (должен быть пустым):", { ...buyerModel.validate() });
-
-console.log("Тестирование clearData(): Очистка данных");
-buyerFull.clearData();
-console.log("getData() после clearData():", { ...buyerFull.getData() });
-console.log("isValid() (должен быть false):", buyerFull.isValid());
-console.log("validate() (должен содержать ошибки для всех полей):", {
-  ...buyerFull.validate(),
-});
-
-console.log(
-  "Тестирование геттеров и сеттеров: Установка значений через сеттеры"
-);
-buyerModel.payment = "online";
-buyerModel.address = "ул. Гагарина, д. 5";
-buyerModel.email = "setter@example.com";
-buyerModel.phone = "+7 (777) 111-22-33";
-console.log("getData() после установки через сеттеры:", {
-  ...buyerModel.getData(),
-});
-console.log("isValid() (должен быть true):", buyerModel.isValid());
-console.log("validate() (должен быть пустым):", { ...buyerModel.validate() });
-
-console.log("Тестирование геттеров: Получение значений");
-console.log("payment:", buyerModel.payment);
-console.log("address:", buyerModel.address);
-console.log("email:", buyerModel.email);
-console.log("phone:", buyerModel.phone);
-
-console.log(
-  "Тестирование validate(): Частично заполненные данные (только payment)"
-);
-buyerFull.setData({ payment: "cash" });
-console.log("validate():", { ...buyerFull.validate() });
-console.log("isValid() (должен быть false):", buyerFull.isValid());
-
-// Тестирование с null payment
-console.log("Тестирование: Установка payment в null");
-buyerFull.payment = null;
-console.log("validate():", { ...buyerFull.validate() });
-console.log("isValid() (должен быть false):", buyerFull.isValid());
-
-//  ************************
-//  тестирование класса Catalog
-//  ************************
-console.log("***************************");
-console.log("тестирование класса Catalog");
-console.log("***************************");
-
-const functionTestCatalog = () => {
-  const testProduct2: IProduct = {
-    id: "b06cde61-912f-4663-9751-09956c0eed67",
-    description: "Будет стоять над душой и не давать прокрастинировать.",
-    image: "/Asterisk_2.svg",
-    title: "Мамка-таймер",
-    category: "софт-скил",
-    price: null,
-  };
-
-  console.log("getProducts() (должен быть весь список товаров):", [
-    ...catalogModel.getProducts(),
-  ]);
-  console.log(
-    "getSelectedProduct() (должен быть null, так как ничего не выбрано):",
-    catalogModel.getSelectedProduct()
-  );
-
-  console.log(
-    'Тестирование selectProductById(): Выбор товаров с id "1c521d84-c48d-48fa-8cfb-9d911fa515fd"'
-  );
-  catalogModel.selectProductById("1c521d84-c48d-48fa-8cfb-9d911fa515fd");
-  console.log(
-    'getSelectedProduct() после selectProductById("1c521d84-c48d-48fa-8cfb-9d911fa515fd"):',
-    { ...catalogModel.getSelectedProduct() }
-  );
-  console.log("getProducts() (не должен измениться):", [
-    ...catalogModel.getProducts(),
-  ]);
-
-  console.log(
-    'Тестирование selectProductById(): Выбор товара с несуществующим id "999"'
-  );
-  catalogModel.selectProductById("999");
-  console.log(
-    'getSelectedProduct() после selectProductById("999") (должен быть null):',
-    catalogModel.getSelectedProduct()
-  );
-
-  console.log(
-    "Тестирование setSelectedProduct(): Установка выбранного товарв вручную"
-  );
-  catalogModel.setSelectedProduct(testProduct2);
-  console.log("getSelectedProduct() после setSelectedProduct():", {
-    ...catalogModel.getSelectedProduct(),
+events.on('catalog:change', (products: IProduct[]) => {
+  const cardElements: HTMLElement[] = products.map((product) => {
+    const cardTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement;
+    const card = new CardCatalog(cloneTemplate(cardTemplate), {
+      onClick: () => {
+        events.emit('catalog:select', product);
+      },
+    });
+    return card.render(product);
   });
-};
+  gallery.render({ catalog: cardElements });
+});
+
+events.on('basket:open', () => {
+  const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
+  const basketView = new BasketModal(events, cloneTemplate(basketTemplate));
+
+  const basketItems = BasketModel.getItems().map((item) => {
+    const cardTemplate = document.querySelector('#card-basket') as HTMLTemplateElement; 
+    const card = new CardBasket(cloneTemplate(cardTemplate), {
+      deleteCard: () => {
+        BasketModel.removeItemById(item.id);
+        events.emit('basket:remove', item);
+        events.emit('basket:open'); 
+      }
+    });
+    return card.render(item);
+  });
+
+  console.log(basketItems)
+
+  basketView.catalog = basketItems;
+  basketView.total = BasketModel.getTotalPrice();
+  basketView.setButtonDisable(BasketModel.getItemCount() === 0);
+
+  modal.content = basketView.render();
+  modal.open();
+});
+
+events.on('catalog:select', (product: IProduct) => {
+  const previewTemplate = document.querySelector('#card-preview') as HTMLTemplateElement;
+  
+  const cardPreview = new CardPreview(cloneTemplate(previewTemplate), {
+    toogleCardBasket: () => {
+      if (BasketModel.hasItem(product.id)) {
+        events.emit('basket:remove', product);
+      } else {
+        events.emit('basket:add', product);
+      }
+    }
+  });
+
+  if (!product.price) {
+    cardPreview.setDisableButton(true);
+  } else if (BasketModel.hasItem(product.id)) {
+    cardPreview.setTextButton('Удалить из корзины');
+  } else {
+    cardPreview.setTextButton('Купить');
+  }
+  
+  modal.content = cardPreview.render(product);
+  modal.open();
+
+});
+
+events.on('basket:add', (product: IProduct) => {
+  BasketModel.addItem(product);
+});
+
+events.on('basket:remove', (product: IProduct) => {
+  BasketModel.removeItem(product); 
+});
+
+events.on('basket:changed', () => {
+  header.counter = BasketModel.getItemCount();
+  modal.close();
+});
 
 const webLarekApi = new WebLarekAPI(baseApi);
 webLarekApi
   .getProducts()
   .then((products: IProduct[]) => {
     catalogModel.setProducts(products);
-    console.log("Список товаров с сервера: ", catalogModel.getProducts());
-    functionTestCatalog();
   })
   .catch((error) => {
     console.error("Ошибка при получении товаров с сервера:", error);

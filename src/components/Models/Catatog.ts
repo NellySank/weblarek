@@ -1,12 +1,16 @@
 import { IProduct } from "../../types";
+import { IEvents } from "../base/Events";
 
 export class Catalog {
   private _products: IProduct[] = [];
   private _selectedProduct: IProduct | null = null;
 
+  constructor(private events: IEvents) {} 
+
   // Сохранить массив товаров
   setProducts(products: IProduct[]): void {
     this._products = products;
+    this.events.emit('catalog:change', products);
   }
 
  // Получить список товаров
