@@ -1,7 +1,7 @@
 import { Api } from "./components/base/Api";
 import { Basket } from "./components/Models/Basket";
 import { Catalog } from "./components/Models/Catatog";
-import { Buyer } from "./components/Models/Buyer";
+import { Buyer, TValidationErrors } from "./components/Models/Buyer";
 import "./scss/styles.scss";
 import { IProduct, WebLarekAPI } from "./types";
 import { API_URL } from "./utils/constants";
@@ -14,6 +14,7 @@ import { CardPreview } from "./components/Views/CardPreview.ts";
 import { Modal } from "./components/Views/Modal.ts";
 import { CardBasket } from "./components/Views/CardBasket.ts";
 import { BasketModal } from "./components/Views/BasketModal.ts";
+import { FormOrder } from "./components/Views/FormOrder.ts";
 
 const baseApi = new Api(API_URL);
 const events = new EventEmitter();
@@ -108,6 +109,56 @@ events.on('basket:changed', () => {
   header.counter = BasketModel.getItemCount();
   modal.close();
 });
+
+events.on('basket:order', () => {
+  // Получаем шаблон формы заказа
+  const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
+  
+  // Создаём экземпляр FormOrder с обработчиком отправки
+  const formOrder = new FormOrder(cloneTemplate(orderTemplate), {
+     validation: () => {
+      events.emit('order:validation', formOrder);
+     }
+  });
+
+  // Устанавливаем форму как содержимое модалки и открываем
+  modal.content = formOrder.render();
+  modal.open();
+});
+
+events.on('order:validation', (formOrder: FormOrder) => {
+  console.log('validation');
+ 
+  const errors: TValidationErrors = {};
+  
+  const cardButton = document.querySelector('.order__buttons button[name="card"]') as HTMLButtonElement;
+  const cashButton = document.querySelector('.order__buttons button[name="cash"]') as HTMLButtonElement;
+  const paymentSelected = cardButton?.classList.contains('button_alt-active') || cashButton?.classList.contains('button_alt-active');
+
+    if (!paymentSelected) {
+    errors.payment = 'Выберите способ оплаты';
+  }
+
+  const addressInput = document.querySelector('input[name="address"]') as HTMLInputElement;
+  const addressValue = addressInput?.value.trim() || '';
+  
+  if (!addressValue) {
+    errors.address = 'Введите адрес';
+  }
+
+   if (Object.keys(errors).length > 0) {
+    formOrder.error = Object.values(errors).join(', ');
+    formOrder.setDisableButton(true);
+  } else {
+    // Если ошибок нет — очищаем _errorsContainer и разблокируем кнопку
+    formOrder.error = '';
+    formOrder.setDisableButton(false);
+  }
+
+});
+
+
+
 
 const webLarekApi = new WebLarekAPI(baseApi);
 webLarekApi

@@ -20,7 +20,7 @@ export class Card<TCardBase> extends Component<TCardBase> {
   }
 
   set price(value: number) {
-    this._priceElement.textContent = value ? String(value) : 'Бесценно';
+    this._priceElement.textContent = value ? String(value) + ' синапсов' : 'Бесценно';
   }
 
 }

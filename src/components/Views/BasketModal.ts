@@ -27,7 +27,7 @@ export class BasketModal extends Component<IBasket> {
     }
 
     set total(value: number) {
-      this._totalPriceElement.textContent = String(value);
+      this._totalPriceElement.textContent = String(value) + ' синапсов';
     }
 
     set catalog(items: HTMLElement[]) {

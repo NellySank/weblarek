@@ -80,7 +80,7 @@ export class Buyer implements IBuyer {
   }
 
   // Геттеры 
-  public get payment(): 'online' | 'cash' | null {
+  public get payment(): 'card' | 'cash' | null {
     return this._payment;
   }
 
@@ -97,7 +97,7 @@ export class Buyer implements IBuyer {
   }
 
   // Сеттеры
-  public set payment(value: 'online' | 'cash' | null) {
+  public set payment(value: 'card' | 'cash' | null) {
     this._payment = value;
   }
 
