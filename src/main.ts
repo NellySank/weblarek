@@ -172,7 +172,7 @@ events.on('basket:remove', (product: IProduct) => {
 events.on('basket:changed', () => {
   header.counter = basketModel.getItemCount();
 
-  const basketItems = basketModel.getItems().map((item) => {
+  const basketItems = basketModel.getItems().map((item, index) => {
     
     const card = new CardBasket(cloneTemplate(cardTemplate), {
       deleteCard: () => {
@@ -180,7 +180,7 @@ events.on('basket:changed', () => {
         events.emit('basket:open'); 
       }
     });
-    return card.render(item);
+    return card.render({ ...item, index: index + 1 });
   });
 
   basketView.catalog = basketItems;
