@@ -22,17 +22,71 @@ const baseApi = new Api(API_URL);
 const events = new EventEmitter();
 const catalogModel = new Catalog(events);
 
-const BasketModel = new Basket(events);
+const basketModel = new Basket(events);
 const buyerModel = new Buyer(events);
 
-const pageElement = document.querySelector('.page') as HTMLElement;
+const pageElement = ensureElement<HTMLElement>('.page');
 const gallery = new Gallery(events, pageElement);
 
-const headerElement = document.querySelector('.header') as HTMLElement; 
+const headerElement = ensureElement<HTMLElement>('.header');
 const header = new Header(events, headerElement);
 
-const modalElement = document.querySelector('.modal') as HTMLElement;
+const modalElement = ensureElement<HTMLElement>('.modal');
 const modal = new Modal(events, modalElement);
+
+const basketTemplate = ensureElement<HTMLTemplateElement>('#basket');
+const cardTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
+const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
+const previewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
+const orderTemplate = ensureElement<HTMLTemplateElement>('#order');
+const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
+const successTemplate = ensureElement<HTMLTemplateElement>('#success');
+
+const basketView = new BasketModal(events, cloneTemplate(basketTemplate));
+
+const orderContainer = cloneTemplate(orderTemplate);
+const formOrder = new FormOrder(orderContainer, {
+    setPayment: (selectedPayment: TPayment) => {
+
+      const buyer: Partial<IBuyer> = {payment: selectedPayment}
+      events.emit('payment: change', buyer);
+      events.emit('order:validation');
+    
+    },
+    setAddress: (addressValue: string) => {
+
+      const buyer: Partial<IBuyer> = {address: addressValue}
+      events.emit('address: change', buyer);
+      events.emit('order:validation');
+    },
+    onSubmit: (event) => { 
+      event.preventDefault(); 
+      events.emit('basket:contacts');
+},
+});
+
+const contactsContainer = cloneTemplate(contactsTemplate);
+  
+const formContact = new FormContact(contactsContainer, {
+  setEmail: (emailValue: string) => {
+
+    const buyer: Partial<IBuyer> = {email: emailValue}
+    events.emit('email: change', buyer);
+    events.emit('contacts:validation');
+  },
+  setPhone: (phoneValue: string) => {
+
+    const buyer: Partial<IBuyer> = {phone: phoneValue}
+    events.emit('phone: change', buyer);
+    events.emit('contacts:validation');
+  },
+
+  onSubmit: (event) => {
+    event.preventDefault(); 
+    events.emit('order: send');
+  },
+
+});
 
 const createOrderData = (basket: Basket, buyer: Buyer): TOrderData => {
   if (!buyer.isValid()) {
@@ -57,8 +111,8 @@ const createOrderData = (basket: Basket, buyer: Buyer): TOrderData => {
 
 events.on('catalog:change', (products: IProduct[]) => {
   const cardElements: HTMLElement[] = products.map((product) => {
-    const cardTemplate = document.querySelector('#card-catalog') as HTMLTemplateElement;
-    const card = new CardCatalog(cloneTemplate(cardTemplate), {
+    
+    const card = new CardCatalog(cloneTemplate(cardCatalogTemplate), {
       onClick: () => {
         events.emit('catalog:select', product);
       },
@@ -69,34 +123,22 @@ events.on('catalog:change', (products: IProduct[]) => {
 });
 
 events.on('basket:open', () => {
-  const basketTemplate = document.querySelector('#basket') as HTMLTemplateElement;
-  const basketView = new BasketModal(events, cloneTemplate(basketTemplate));
-
-  const basketItems = BasketModel.getItems().map((item) => {
-    const cardTemplate = document.querySelector('#card-basket') as HTMLTemplateElement; 
-    const card = new CardBasket(cloneTemplate(cardTemplate), {
-      deleteCard: () => {
-        BasketModel.removeItemById(item.id);
-        events.emit('basket:open'); 
-      }
-    });
-    return card.render(item);
-  });
-
-  basketView.catalog = basketItems;
-  basketView.total = BasketModel.getTotalPrice();
-  basketView.setButtonDisable(BasketModel.getItemCount() === 0);
-
+  
   modal.content = basketView.render();
   modal.open();
 });
 
 events.on('catalog:select', (product: IProduct) => {
-  const previewTemplate = document.querySelector('#card-preview') as HTMLTemplateElement;
-  
+
+  catalogModel.setSelectedProduct(product);
+
+});
+
+events.on('product:preview', (product: IProduct) => {
+
   const cardPreview = new CardPreview(cloneTemplate(previewTemplate), {
     toogleCardBasket: () => {
-      if (BasketModel.hasItem(product.id)) {
+      if (basketModel.hasItem(product.id)) {
         events.emit('basket:remove', product);
         modal.close();
       } else {
@@ -108,7 +150,7 @@ events.on('catalog:select', (product: IProduct) => {
 
   if (!product.price) {
     cardPreview.setDisableButton(true);
-  } else if (BasketModel.hasItem(product.id)) {
+  } else if (basketModel.hasItem(product.id)) {
     cardPreview.setTextButton('Удалить из корзины');
   } else {
     cardPreview.setTextButton('Купить');
@@ -116,49 +158,39 @@ events.on('catalog:select', (product: IProduct) => {
   
   modal.content = cardPreview.render(product);
   modal.open();
-
-});
+  
+})
 
 events.on('basket:add', (product: IProduct) => {
-  BasketModel.addItem(product);
+  basketModel.addItem(product);
 });
 
 events.on('basket:remove', (product: IProduct) => {
-  BasketModel.removeItem(product); 
+  basketModel.removeItem(product); 
 });
 
 events.on('basket:changed', () => {
-  header.counter = BasketModel.getItemCount();
-});
+  header.counter = basketModel.getItemCount();
 
-events.on('basket:order', () => {
-  const orderTemplate = document.querySelector('#order') as HTMLTemplateElement;
-  const orderContainer = cloneTemplate(orderTemplate);
-
-  const formOrder = new FormOrder(orderContainer, {
-     setPayment: () => {
-      const selectedButtonPayment = ensureElement<HTMLButtonElement>('.button_alt-active', orderContainer);
-
-      if (selectedButtonPayment.name) {
-        const buyer: Partial<IBuyer> = {payment: selectedButtonPayment.name as TPayment}
-        events.emit('payment: change', buyer);
-        events.emit('order:validation', formOrder);
+  const basketItems = basketModel.getItems().map((item) => {
+    
+    const card = new CardBasket(cloneTemplate(cardTemplate), {
+      deleteCard: () => {
+        basketModel.removeItemById(item.id);
+        events.emit('basket:open'); 
       }
-      
-     },
-     setAddress: () => {
-      const inputAddress = ensureElement<HTMLInputElement>('input[name="address"]', orderContainer);
-      buyerModel.address = inputAddress.value;
-      const buyer: Partial<IBuyer> = {address: inputAddress.value}
-      events.emit('address: change', buyer);
-      events.emit('order:validation', formOrder);
-     },
-     onSubmit: (event) => { 
-      event.preventDefault(); 
-      events.emit('basket:contacts');
-  },
+    });
+    return card.render(item);
   });
 
+  basketView.catalog = basketItems;
+  basketView.total = basketModel.getTotalPrice();
+  basketView.setButtonDisable(basketModel.getItemCount() === 0);
+
+});
+
+
+events.on('basket:order', () => {
   modal.content = formOrder.render();
   modal.open();
 });
@@ -174,7 +206,7 @@ events.on('payment: change', (buyer: Partial<IBuyer>) => {
   }
 })
 
-events.on('order:validation', (formOrder: FormOrder) => {
+events.on('order:validation', () => {
  
   const allErrors: TValidationErrors = buyerModel.validate();
 
@@ -193,31 +225,6 @@ events.on('order:validation', (formOrder: FormOrder) => {
 });
 
 events.on('basket:contacts', () => {
-  const contactsTemplate = document.querySelector('#contacts') as HTMLTemplateElement;
-  const contactsContainer = cloneTemplate(contactsTemplate);
-  
-  const formContact = new FormContact(contactsContainer, {
-    setEmail: () => {
-      const emailInput = ensureElement<HTMLInputElement>('input[name="email"]', contactsContainer);
-      const emailValue = emailInput.value;
-      const buyer: Partial<IBuyer> = {email: emailValue}
-      events.emit('email: change', buyer);
-      events.emit('contacts:validation', formContact);
-    },
-    setPhone: () => {
-      const phoneInput = ensureElement<HTMLInputElement>('input[name="phone"]', contactsContainer);
-      const phoneValue = phoneInput.value;
-      const buyer: Partial<IBuyer> = {phone: phoneValue}
-      events.emit('phone: change', buyer);
-      events.emit('contacts:validation', formContact);
-    },
-
-    onSubmit: (event) => {
-      event.preventDefault(); 
-      events.emit('order: send');
-    },
-
-  });
 
   modal.content = formContact.render();
   modal.open();
@@ -231,8 +238,7 @@ events.on('phone: change', (buyer: Partial<IBuyer>) => {
   buyerModel.phone = buyer.phone ?? '';
 })
 
-
-events.on('contacts:validation', (formContact: FormContact) => {
+events.on('contacts:validation', () => {
 
   const allErrors: TValidationErrors = buyerModel.validate();
   console.log(allErrors);
@@ -253,7 +259,7 @@ events.on('contacts:validation', (formContact: FormContact) => {
 });
 
 events.on('order: send', () => {
-  const orderData = createOrderData(BasketModel, buyerModel);
+  const orderData = createOrderData(basketModel, buyerModel);
 
   webLarekApi
   .createOrder(orderData) 
@@ -267,16 +273,16 @@ events.on('order: send', () => {
 });
 
 events.on('order: success', () => {
-  const successTemplate = document.querySelector('#success') as HTMLTemplateElement;
+  
   const successContainer = cloneTemplate(successTemplate);
   
   const successPage = new SuccessPage(events, successContainer);
-  successPage.total = BasketModel.getTotalPrice();
+  successPage.total = basketModel.getTotalPrice();
  
   modal.content = successPage.render();
   modal.open();
 
-  BasketModel.clear();
+  basketModel.clear();
   buyerModel.clearData();
   
 });

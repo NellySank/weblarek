@@ -14,13 +14,13 @@ export class FormContact extends Form {
 
     this._emailElement.addEventListener('input', () => {
       if (action?.setEmail) {
-          action?.setEmail();
+          action?.setEmail(this._emailElement.value);
       }
     });
 
     this._phoneElement.addEventListener('input', () => {
       if (action?.setPhone) {
-          action?.setPhone();
+          action?.setPhone(this._phoneElement.value);
       }
     });
 

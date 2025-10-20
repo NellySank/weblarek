@@ -1,13 +1,14 @@
+import { TPayment } from "../../../types";
 import { ensureElement } from "../../../utils/utils";
 import { Component } from "../../base/Component";
 
 export interface IFormAction {
   onSubmit?: (event: Event) => void;
   validation?: () => void;
-  setPayment?:() => void;
-  setAddress?:() => void;
-  setEmail?:() => void;
-  setPhone?:() => void;
+  setPayment?:(selectedPayment: TPayment) => void;
+  setAddress?:(addressValue: string) => void;
+  setEmail?:(emailValue: string) => void;
+  setPhone?:(phoneValue: string) => void;
 }
 
 interface TForm {

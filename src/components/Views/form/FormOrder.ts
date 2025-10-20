@@ -28,7 +28,7 @@ export class FormOrder extends Form {
         this._buttonCashElement.classList.add('button_alt'); 
 
         if (action?.setPayment) {
-         action?.setPayment();
+         action?.setPayment('card');
         }
     });
 
@@ -40,13 +40,14 @@ export class FormOrder extends Form {
       this._buttonCardElement.classList.add('button_alt');
 
        if (action?.setPayment) {
-         action?.setPayment();
+         action?.setPayment('cash');
         }
     });
 
     this._inputAddressElement.addEventListener('input', () => {
       if (action?.setAddress) {
-        action?.setAddress();
+
+        action?.setAddress(this._inputAddressElement.value);
       }
     });
 

@@ -18,6 +18,7 @@ export class BasketModal extends Component<IBasket> {
     super(container)
   
       this._catalogElement = ensureElement<HTMLElement>('.basket__list', this.container);
+      this._catalogElement.innerHTML = 'Корзина пуста';
       this._totalPriceElement = ensureElement<HTMLElement>('.basket__price', this.container);
       this._buttonElement = ensureElement<HTMLButtonElement>('.basket__button', this.container);
 
