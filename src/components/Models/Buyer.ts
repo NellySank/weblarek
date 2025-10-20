@@ -1,4 +1,5 @@
 import { IBuyer, TPayment } from "../../types";
+import { IEvents } from "../base/Events";
 
 export type TValidationErrors = {
   payment?: string;
@@ -14,11 +15,7 @@ export class Buyer implements IBuyer {
   private _phone: string = '';
 
   // Конструктор для инициализации
-  constructor(data?: Partial<Buyer>) {
-    if (data) {
-      this.setData(data);
-    }
-  }
+  constructor(private events: IEvents) { }
 
   // Сохранение данных
   public setData(data: Partial<IBuyer>): void {
@@ -97,7 +94,7 @@ export class Buyer implements IBuyer {
   }
 
   // Сеттеры
-  public set payment(value: 'card' | 'cash' | null) {
+  public set payment(value: TPayment) {
     this._payment = value;
   }
 

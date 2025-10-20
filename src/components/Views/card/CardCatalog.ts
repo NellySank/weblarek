@@ -1,8 +1,8 @@
-import { IProduct } from "../../types";
-import { categoryMap } from "../../utils/constants";
-import { ensureElement } from "../../utils/utils";
+import { IProduct } from "../../../types";
+import { categoryMap } from "../../../utils/constants";
+import { ensureElement } from "../../../utils/utils";
 import { Card } from "./Card";
-import { CDN_URL } from "../../utils/constants";
+import { CDN_URL } from "../../../utils/constants";
 
 
 export interface ICardAction {

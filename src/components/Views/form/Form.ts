@@ -1,8 +1,13 @@
-import { ensureElement } from "../../utils/utils";
-import { Component } from "../base/Component";
+import { ensureElement } from "../../../utils/utils";
+import { Component } from "../../base/Component";
 
-export interface IFromAction {
-  onClick?: () => void;
+export interface IFormAction {
+  onSubmit?: (event: Event) => void;
+  validation?: () => void;
+  setPayment?:() => void;
+  setAddress?:() => void;
+  setEmail?:() => void;
+  setPhone?:() => void;
 }
 
 interface TForm {
@@ -14,16 +19,16 @@ export class Form extends Component<TForm>{
   protected _submitButton: HTMLButtonElement;
   protected _errorsContainer: HTMLElement;
 
-  constructor(container: HTMLElement, action?: IFromAction) {
+  constructor(container: HTMLElement, action?: IFormAction) {
     super(container);
 
     this._formContentElement = ensureElement<HTMLElement>('.order',this.container);
     this._errorsContainer = ensureElement<HTMLElement>('.form__errors',this.container);
-    this._submitButton = ensureElement<HTMLButtonElement>('.order__button',this.container);
+    this._submitButton = ensureElement<HTMLButtonElement>('.modal__actions .button',this.container);
 
-    if (action?.onClick) {
-        this._submitButton.addEventListener('click', action?.onClick);
-      }
+    if (action?.onSubmit) {
+        this.container.addEventListener('submit', action.onSubmit);
+    }
   }
 
   set error(value: string) {

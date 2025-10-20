@@ -1,4 +1,4 @@
-import { ensureElement } from "../../utils/utils";
+import { ensureElement } from "../../../utils/utils";
 import { Card, TCardBase } from "./Card";
 import { ICardAction } from "./CardCatalog";
 

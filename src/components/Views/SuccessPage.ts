@@ -23,7 +23,7 @@ export class SuccessPage extends Component<ISuccessPageData> {
     }
 
     set total (value: number) {
-      this._descriptionElement.textContent = String(value);
+      this._descriptionElement.textContent = 'Списано '+ String(value) + 'синапсов';
     }
 
 }

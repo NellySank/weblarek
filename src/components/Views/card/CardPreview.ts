@@ -1,9 +1,9 @@
-import { IProduct } from "../../types";
-import { CDN_URL } from "../../utils/constants";
-import { ensureElement } from "../../utils/utils";
+import { IProduct } from "../../../types";
+import { CDN_URL } from "../../../utils/constants";
+import { ensureElement } from "../../../utils/utils";
 import { Card } from "./Card";
 import { CategoryKey, ICardAction } from "./CardCatalog";
-import { categoryMap } from "../../utils/constants";
+import { categoryMap } from "../../../utils/constants";
 
 type TCardPreview = Pick<IProduct, 'image' | 'category' | 'description'>
 
