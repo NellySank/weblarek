@@ -1,34 +1,30 @@
-import { TPayment } from "../../../types";
 import { ensureElement } from "../../../utils/utils";
 import { Component } from "../../base/Component";
 
 export interface IFormAction {
   onSubmit?: (event: Event) => void;
-  validation?: () => void;
-  setPayment?:(selectedPayment: TPayment) => void;
-  setAddress?:(addressValue: string) => void;
-  setEmail?:(emailValue: string) => void;
-  setPhone?:(phoneValue: string) => void;
 }
 
-interface TForm {
+interface IForm {
   content: HTMLElement;
+  isDisableButton: boolean;
+  error: string;
 }
 
-export class Form extends Component<TForm>{
+export class Form<IForm> extends Component<IForm>{
   protected _formContentElement: HTMLElement;
   protected _submitButton: HTMLButtonElement;
   protected _errorsContainer: HTMLElement;
 
-  constructor(container: HTMLElement, action?: IFormAction) {
+  constructor(container: HTMLElement, actions?: IFormAction) {
     super(container);
 
     this._formContentElement = ensureElement<HTMLElement>('.order',this.container);
     this._errorsContainer = ensureElement<HTMLElement>('.form__errors',this.container);
     this._submitButton = ensureElement<HTMLButtonElement>('.modal__actions .button',this.container);
 
-    if (action?.onSubmit) {
-        this.container.addEventListener('submit', action.onSubmit);
+    if (actions?.onSubmit) {
+      this.container.addEventListener('submit', actions.onSubmit);
     }
   }
 

@@ -96,17 +96,21 @@ export class Buyer implements IBuyer {
   // Сеттеры
   public set payment(value: TPayment) {
     this._payment = value;
+    this.events.emit('order:validation');
   }
 
   public set address(value: string) {
     this._address = value;
+    this.events.emit('order:validation');
   }
 
   public set email(value: string) {
     this._email = value;
+    this.events.emit('contacts:validation');
   }
 
   public set phone(value: string) {
     this._phone = value;
+    this.events.emit('contacts:validation');
   }
 }
