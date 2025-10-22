@@ -207,8 +207,6 @@ events.on('basket:contacts', () => {
     isDisableButton: buyerModel.email === '' || buyerModel.phone === ''
   }
 
-  console.log(contactsData)
-
   modal.content = formContact.render(contactsData);
   modal.open();
 });
