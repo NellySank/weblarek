@@ -6,6 +6,7 @@ import { Form, IFormAction } from "./Form";
 export interface TFormOrder {
   payment: TPayment;
   address: string;
+  isDisableButton: boolean
 }
 
 export class FormOrder extends Form<TFormOrder> {

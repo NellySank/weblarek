@@ -36,7 +36,7 @@ export class Form<IForm> extends Component<IForm>{
     this._formContentElement.replaceChildren(orderData);
   }
 
-   setDisableButton(isDisable: boolean) {
+  set isDisableButton(isDisable: boolean) {
     this._submitButton.disabled = isDisable;
   }
 }

@@ -163,7 +163,8 @@ events.on('basket:order', () => {
 
  const orderData: TFormOrder = {
   address: buyerModel.address ?? '',
-  payment: buyerModel.payment ?? null
+  payment: buyerModel.payment ?? null,
+  isDisableButton: buyerModel.address.trim() === '' ||  buyerModel.payment === null
  };
 
   modal.content = formOrder.render(orderData);
@@ -191,10 +192,10 @@ events.on('order:validation', () => {
 
   if (Object.keys(orderFormErrors).length > 0) {
     formOrder.error = Object.values(orderFormErrors).join(', ');
-    formOrder.setDisableButton(true);
+    formOrder.isDisableButton = true;
   } else {
     formOrder.error = '';
-    formOrder.setDisableButton(false);
+    formOrder.isDisableButton = false;
   }
 });
 
@@ -202,8 +203,11 @@ events.on('basket:contacts', () => {
 
   const contactsData: IFormContacts = {
     email: buyerModel.email ?? '',
-    phone: buyerModel.phone ?? ''
+    phone: buyerModel.phone ?? '',
+    isDisableButton: buyerModel.email === '' || buyerModel.phone === ''
   }
+
+  console.log(contactsData)
 
   modal.content = formContact.render(contactsData);
   modal.open();
@@ -228,10 +232,10 @@ events.on('contacts:validation', () => {
 
   if (Object.keys(contactFormErrors).length > 0) {
     formContact.error = Object.values(contactFormErrors).join(', ');
-    formContact.setDisableButton(true);
+    formContact.isDisableButton = true;
   } else {
     formContact.error = '';
-    formContact.setDisableButton(false);
+    formContact.isDisableButton = false;
   }
 
 });

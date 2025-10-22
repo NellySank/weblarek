@@ -6,6 +6,7 @@ import { Form, IFormAction } from "./Form";
 export interface IFormContacts {
   email: string;
   phone: string;
+  isDisableButton: boolean;
 }
 
 export class FormContact extends Form<IFormContacts> {
